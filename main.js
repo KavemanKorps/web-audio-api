@@ -6,7 +6,7 @@ const startCtxBtn = document.querySelector(".start");
 const setupSamplesBtn = document.querySelector(".setup-samples");
 const playSampleBtn = document.querySelector(".play-sample");
 
-const samplePaths = ["./audio/explosionLoud.mp3", "./audio/laser.mp3"];
+const samplePaths = ["./audio/smooth-jazz.mp3", "./audio/explosionLoud.mp3", "./audio/laser.mp3"];
 
 startCtxBtn.addEventListener("click", () => {
     audioContext = new AudioContext();
@@ -23,7 +23,11 @@ setupSamplesBtn.addEventListener("click", () => {
         console.log(samples);
         // a nested addEventListener! For actually playing the sample:
         playSampleBtn.addEventListener("click", () => {
-            playSample(samples[1], 0);
+            // we set this to a var for pausing later on...
+            const playing = playSample(samples[0], 0);
+            setTimeout(() => {
+                playing.stop();     // stop audio from playing after 3 seconds
+            }, 3000);
         });
     })
 });
@@ -67,4 +71,7 @@ function playSample(audioBuffer, time) {
     sampleSource.buffer = audioBuffer;   // declare sampleSource's buffer (audio itself)
     sampleSource.connect(audioContext.destination);  // audioContext.destination is the speakers
     sampleSource.start(time);   // play audio!
+    return sampleSource; // return for pausing purposes
 }
+
+// every time we want to play our audio, we need to create an AudioBuffer every single time! (most optimized)
