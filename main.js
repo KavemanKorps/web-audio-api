@@ -1,42 +1,19 @@
-const playBtn = document.querySelector(".play");
-const pauseBtn = document.querySelector(".pause");
-const stopBtn = document.querySelector(".stop");
+// GLOBAL ACCESS TO AUDIO CONTEXT:
+let audioContext;
+const startBtn = document.querySelector(".start");
 
-const audioContext = new AudioContext();    // load up our audio context -needed for playing audio
-const audio = new Audio("./audio/smooth-jazz.mp3");
-
-// WITH "source" and "connect" commented out, audio will still play. However, we won't be able to tinker with 
-// its volume if we do so:
-// create source for audio context by making a media element
-const source = audioContext.createMediaElementSource(audio);
-
-// this is a volume "node":
-const volume = audioContext.createGain();
-// HERE'S HOW TO INC/DECREASE VOLUME OF AUDIO:
-volume.gain.value = 0.2;
-
-source.connect(audioContext.destination);
-
-// play/pause audio when buttons are clicked
-playBtn.addEventListener("click", () => {
-    // audioContexts have a "state" property:
-    if (audioContext.state === "suspended") {
-        // with this "if", if we pause and resume playing, the audio will not start from the beginning:
-        audioContext.resume();
-    }
-    audio.play();   
+startBtn.addEventListener("click", () => {
+    audio.play();
 });
 
-pauseBtn.addEventListener("click", () => {
-    audio.pause();
-});
+/* we're gonna have to call the fetch api with the file path and get an array buffer from that.
+because we have to wait (calling this func from elsewhere), we need to declare it as an async func. */
 
-stopBtn.addEventListener("click", () => {
-    audio.pause();
-    // take audio back to the beginning ("currentTime" is in seconds):
-    audio.currentTime = 0;
-});
-
-/* here we learned ab/ the web audio api, how to load an audio file synchronously, create an audio context, 
-and from that create a media element, an audio source node, which we connected to the destination of the 
-audio context; as well as how to put things inbetween the source and destination (volume node) */
+async function getFile(filePath) {
+    // response returns the raw data to us
+    const response = await fetch(filePath);
+    // we take that response and make an array buffer with it (standard JS way of dealing w/ files):
+    const arrayBuffer = await response.arrayBuffer();
+    // then we create an audio buffer (from which we can play the sound):
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+}
